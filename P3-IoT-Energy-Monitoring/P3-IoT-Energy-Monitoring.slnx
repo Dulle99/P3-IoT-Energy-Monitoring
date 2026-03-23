@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../monitoring-service/MonitoringService/MonitoringService.csproj" />
+  <Project Path="../sensor-simulator/SensorSimulator/SensorSimulator.csproj" />
+  <Project Path="../visualization-service/VisualizationService/VisualizationService.csproj" />
+</Solution>

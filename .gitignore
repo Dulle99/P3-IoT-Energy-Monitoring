@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.db
+TestResults/
+dataset/household_power_consumption.txt

@@ -1,0 +1,6 @@
+@VisualizationService_HostAddress = http://localhost:5092
+
+GET {{VisualizationService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
