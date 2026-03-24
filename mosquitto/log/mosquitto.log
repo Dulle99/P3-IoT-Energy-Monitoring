@@ -1,0 +1,57 @@
+1774361618: mosquitto version 2.1.2 starting
+1774361618: Config loaded from /mosquitto/config/mosquitto.conf.
+1774361618: Bridge support available.
+1774361618: Persistence support available.
+1774361618: TLS support available.
+1774361618: TLS-PSK support available.
+1774361618: Websockets support available.
+1774361618: Opening ipv4 listen socket on port 1883.
+1774361618: Opening ipv6 listen socket on port 1883.
+1774361618: mosquitto version 2.1.2 running
+1774361710: New connection from 172.18.0.1:32860 on port 1883.
+1774361710: New client connected from 172.18.0.1:32860 as c69d2aba1a7b473ba109bfc7d4a40790 (p5, c1, k15).
+1774361730: Client c69d2aba1a7b473ba109bfc7d4a40790 [172.18.0.1:32860] disconnected.
+1774361733: New connection from ::1:48860 on port 1883.
+1774361733: New client connected from ::1:48860 as auto-39C01C79-780F-B3E3-D389-A706CA56487F (p4, c1, k60).
+1774361752: New connection from 172.18.0.1:55730 on port 1883.
+1774361752: New client connected from 172.18.0.1:55730 as 6984e641c5e04cc88ee119102124d993 (p5, c1, k15).
+1774361772: Client 6984e641c5e04cc88ee119102124d993 [172.18.0.1:55730] disconnected.
+1774361821: New connection from ::1:43284 on port 1883.
+1774361821: New client connected from ::1:43284 as auto-2C021DAC-DDD0-7F1C-D22D-8F8F9E1BCEEB (p4, c1, k60).
+1774361834: New connection from 172.18.0.1:45332 on port 1883.
+1774361834: New client connected from 172.18.0.1:45332 as 9489ef47c98046a4a0ed67ac8eeb3ef8 (p5, c1, k15).
+1774361854: Client 9489ef47c98046a4a0ed67ac8eeb3ef8 [172.18.0.1:45332] disconnected.
+1774361955: Client auto-2C021DAC-DDD0-7F1C-D22D-8F8F9E1BCEEB [::1:43284] disconnected.
+1774361957: New connection from ::1:44044 on port 1883.
+1774361957: New client connected from ::1:44044 as auto-D7965FB5-0ED5-3CFE-A186-0EA9005546C3 (p4, c1, k60).
+1774361965: New connection from 172.18.0.1:57670 on port 1883.
+1774361965: New client connected from 172.18.0.1:57670 as 460305210c974902b2e72775d1ec23f4 (p5, c1, k15).
+1774361985: Client 460305210c974902b2e72775d1ec23f4 [172.18.0.1:57670] disconnected.
+1774362035: Client auto-D7965FB5-0ED5-3CFE-A186-0EA9005546C3 [::1:44044] disconnected.
+1774362037: New connection from ::1:60154 on port 1883.
+1774362037: New client connected from ::1:60154 as auto-8C2EF338-8262-74F7-E09A-B9FDB717F5F1 (p4, c1, k60).
+1774362043: New connection from 172.18.0.1:50210 on port 1883.
+1774362043: New client connected from 172.18.0.1:50210 as b6b8abe8e6fa4c239ad4d2b0ecfe05ba (p5, c1, k15).
+1774362063: Client b6b8abe8e6fa4c239ad4d2b0ecfe05ba [172.18.0.1:50210] disconnected.
+1774362086: New connection from ::1:37348 on port 1883.
+1774362086: New client connected from ::1:37348 as auto-566756DD-4AB7-FBD2-F5AF-48308C2B11B8 (p4, c1, k60).
+1774362089: New connection from 172.18.0.1:57198 on port 1883.
+1774362089: New client connected from 172.18.0.1:57198 as f62c38da45f84243a153aa433af23347 (p5, c1, k15).
+1774362110: Client f62c38da45f84243a153aa433af23347 [172.18.0.1:57198] disconnected.
+1774363418: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774365103: New connection from 172.18.0.1:48584 on port 1883.
+1774365103: New client connected from 172.18.0.1:48584 as 4d38117f8e204a9180cd75d571a7c41d (p5, c1, k15).
+1774365164: New connection from 172.18.0.1:50436 on port 1883.
+1774365164: New client connected from 172.18.0.1:50436 as 65975c6e7ba2485eaed334e824b3882c (p5, c1, k15).
+1774365181: Client 65975c6e7ba2485eaed334e824b3882c [172.18.0.1:50436] disconnected: connection closed by client.
+1774365181: Client 4d38117f8e204a9180cd75d571a7c41d [172.18.0.1:48584] disconnected: connection closed by client.
+1774365219: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774365234: New connection from 172.18.0.1:53162 on port 1883.
+1774365234: New client connected from 172.18.0.1:53162 as 6eed1c686e4240f5a2a9c107c04cd00d (p5, c1, k15).
+1774365239: New connection from 172.18.0.1:53166 on port 1883.
+1774365239: New client connected from 172.18.0.1:53166 as 03ec70ac7618459888854e8ed0940679 (p5, c1, k15).
+1774365260: Client 03ec70ac7618459888854e8ed0940679 [172.18.0.1:53166] disconnected.
+1774365269: Client 6eed1c686e4240f5a2a9c107c04cd00d [172.18.0.1:53162] disconnected: connection closed by client.
+1774367020: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774367719: mosquitto version 2.1.2 terminating
+1774367719: Saving in-memory database to /mosquitto/data//mosquitto.db.
