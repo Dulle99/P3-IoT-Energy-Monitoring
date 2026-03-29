@@ -48,7 +48,7 @@ catch (Exception ex)
 #endregion Initial MQTT Client Setup
 
 
-foreach (var r in reading.Take(10)) //za sada neka uzima 10 redova
+foreach (var r in reading.Take(30)) //za sada neka uzima 10 redova
 {
     //sending message to MQTT broker
     var message = new PowerConsumptionMessage

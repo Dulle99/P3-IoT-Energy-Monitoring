@@ -24,3 +24,11 @@ services:
       DOCKER_INFLUXDB_INIT_ORG: p3-org
       DOCKER_INFLUXDB_INIT_BUCKET: energy-bucket
       DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: super-secret-token
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/data:/var/lib/grafana
