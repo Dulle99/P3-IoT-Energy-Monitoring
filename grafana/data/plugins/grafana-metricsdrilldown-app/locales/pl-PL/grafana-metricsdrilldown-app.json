@@ -97,6 +97,25 @@
   "inline-banner": {
     "unknown-error": "Nieznany błąd!"
   },
+  "kg-annotations": {
+    "layer": {
+      "name": ""
+    },
+    "query": {
+      "name": ""
+    },
+    "severity": {
+      "critical": "",
+      "info": "",
+      "warning": ""
+    },
+    "toggle": {
+      "description": "",
+      "disabled-tooltip": "",
+      "label": "",
+      "learn-more": ""
+    }
+  },
   "labels-datasource": {
     "none-option": "(brak)",
     "test-success": "OK"
@@ -327,8 +346,6 @@
       "recent-metrics-description": "Filtrowanie danych na podstawie czasu rozpoczęcia ich pobierania",
       "rules-filters": "Filtry reguł",
       "rules-filters-description": "Filtrowanie wskaźników i reguł rejestrowania",
-      "settings": "Ustawienia",
-      "settings-description": "",
       "suffix-filters": "Filtry sufiksów",
       "suffix-filters-description": "Filtrowanie danych na podstawie sufiksu nazwy"
     }

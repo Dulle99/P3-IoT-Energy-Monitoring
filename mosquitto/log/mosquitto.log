@@ -78,3 +78,143 @@
 1774387543: Saving in-memory database to /mosquitto/data//mosquitto.db.
 1774387647: mosquitto version 2.1.2 terminating
 1774387647: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774776280: mosquitto version 2.1.2 starting
+1774776280: Config loaded from /mosquitto/config/mosquitto.conf.
+1774776280: Bridge support available.
+1774776280: Persistence support available.
+1774776280: TLS support available.
+1774776280: TLS-PSK support available.
+1774776280: Websockets support available.
+1774776280: Opening ipv4 listen socket on port 1883.
+1774776280: Opening ipv6 listen socket on port 1883.
+1774776280: mosquitto version 2.1.2 running
+1774777324: New connection from 172.18.0.1:47702 on port 1883.
+1774777324: New client connected from 172.18.0.1:47702 as 320b94fbfe6f41dcae9349bd49586090 (p5, c1, k15).
+1774777348: New connection from 172.18.0.1:38364 on port 1883.
+1774777348: New client connected from 172.18.0.1:38364 as 44a96fdd9e854efbb2fd9774381832df (p5, c1, k15).
+1774777368: Client 44a96fdd9e854efbb2fd9774381832df [172.18.0.1:38364] disconnected.
+1774777776: Client 320b94fbfe6f41dcae9349bd49586090 [172.18.0.1:47702] disconnected: connection closed by client.
+1774777810: New connection from 172.18.0.1:33178 on port 1883.
+1774777810: New client connected from 172.18.0.1:33178 as 271064d8b86a4d14841957e0f3e09b6b (p5, c1, k15).
+1774777830: Client 271064d8b86a4d14841957e0f3e09b6b [172.18.0.1:33178] disconnected.
+1774777879: New connection from 172.18.0.1:32936 on port 1883.
+1774777879: New client connected from 172.18.0.1:32936 as 158af903f1c84a74a37974767ed9973e (p5, c1, k15).
+1774777897: New connection from 172.18.0.1:39830 on port 1883.
+1774777897: New client connected from 172.18.0.1:39830 as 5501d83fded54d888e89b7dbc66fcc36 (p5, c1, k15).
+1774777917: Client 5501d83fded54d888e89b7dbc66fcc36 [172.18.0.1:39830] disconnected.
+1774777967: Client 158af903f1c84a74a37974767ed9973e [172.18.0.1:32936] disconnected: connection closed by client.
+1774777989: New connection from 172.18.0.1:33160 on port 1883.
+1774777989: New client connected from 172.18.0.1:33160 as 067ac24f6321496ab131fbf6ad9a860d (p5, c1, k15).
+1774778001: New connection from 172.18.0.1:43896 on port 1883.
+1774778001: New client connected from 172.18.0.1:43896 as e74429d212d24779bbee1321bc7dc0b0 (p5, c1, k15).
+1774778024: Client 067ac24f6321496ab131fbf6ad9a860d [172.18.0.1:33160] disconnected: connection closed by client.
+1774778024: Client e74429d212d24779bbee1321bc7dc0b0 [172.18.0.1:43896] disconnected: connection closed by client.
+1774778081: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774778128: New connection from 172.18.0.1:58490 on port 1883.
+1774778128: New client connected from 172.18.0.1:58490 as 0215e561824741659436d42a3e7a85e9 (p5, c1, k15).
+1774778139: New connection from 172.18.0.1:57354 on port 1883.
+1774778139: New client connected from 172.18.0.1:57354 as 9d6058f90a7d4209a2c5e143a6bf8c08 (p5, c1, k15).
+1774778159: Client 9d6058f90a7d4209a2c5e143a6bf8c08 [172.18.0.1:57354] disconnected.
+1774778230: New connection from 172.18.0.1:50538 on port 1883.
+1774778230: New client connected from 172.18.0.1:50538 as 12c2e8bc8bc34f5284ccc0a3de64ee7d (p5, c1, k15).
+1774778250: Client 12c2e8bc8bc34f5284ccc0a3de64ee7d [172.18.0.1:50538] disconnected.
+1774778251: Client 0215e561824741659436d42a3e7a85e9 [172.18.0.1:58490] disconnected: connection closed by client.
+1774778326: New connection from 172.18.0.1:55688 on port 1883.
+1774778326: New client connected from 172.18.0.1:55688 as db0567d11ff14945a113851a3046f6e4 (p5, c1, k15).
+1774778333: New connection from 172.18.0.1:39728 on port 1883.
+1774778333: New client connected from 172.18.0.1:39728 as 8c191bde25d04d77bf5ce0f5d5d6b426 (p5, c1, k15).
+1774778353: Client 8c191bde25d04d77bf5ce0f5d5d6b426 [172.18.0.1:39728] disconnected.
+1774778364: Client db0567d11ff14945a113851a3046f6e4 [172.18.0.1:55688] disconnected: connection closed by client.
+1774778403: New connection from 172.18.0.1:55494 on port 1883.
+1774778403: New client connected from 172.18.0.1:55494 as a1fd434fc6374672bb41873a72f90c37 (p5, c1, k15).
+1774778417: New connection from 172.18.0.1:49978 on port 1883.
+1774778417: New client connected from 172.18.0.1:49978 as 990db92c1cc44c2395225d1d4eae7e77 (p5, c1, k15).
+1774778437: Client 990db92c1cc44c2395225d1d4eae7e77 [172.18.0.1:49978] disconnected.
+1774779882: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774786594: Client a1fd434fc6374672bb41873a72f90c37 [172.18.0.1:55494] disconnected: connection closed by client.
+1774787454: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774788597: New connection from 172.18.0.1:49072 on port 1883.
+1774788597: New client connected from 172.18.0.1:49072 as 52e91adece1247ae9ba2486261e7edf7 (p5, c1, k15).
+1774788612: New connection from 172.18.0.1:44546 on port 1883.
+1774788612: New client connected from 172.18.0.1:44546 as b5f5619ce0144906b52cbd981749532f (p5, c1, k15).
+1774788632: Client b5f5619ce0144906b52cbd981749532f [172.18.0.1:44546] disconnected.
+1774788649: Client 52e91adece1247ae9ba2486261e7edf7 [172.18.0.1:49072] disconnected: connection closed by client.
+1774788713: New connection from 172.18.0.1:58146 on port 1883.
+1774788713: New client connected from 172.18.0.1:58146 as fb990ab68d8746268fa9bdc4b2c8af0e (p5, c1, k15).
+1774788722: New connection from 172.18.0.1:40844 on port 1883.
+1774788722: New client connected from 172.18.0.1:40844 as 8c1fe9f2aa6d45f581c148a342e9c1ae (p5, c1, k15).
+1774788783: Client 8c1fe9f2aa6d45f581c148a342e9c1ae [172.18.0.1:40844] disconnected.
+1774788848: Client fb990ab68d8746268fa9bdc4b2c8af0e [172.18.0.1:58146] disconnected: connection closed by client.
+1774788881: New connection from 172.18.0.1:45504 on port 1883.
+1774788881: New client connected from 172.18.0.1:45504 as f907f0d70f68489eaef6464f326786ea (p5, c1, k15).
+1774788899: New connection from 172.18.0.1:60116 on port 1883.
+1774788899: New client connected from 172.18.0.1:60116 as d04560246c2842c9a7d3fc768fe12a34 (p5, c1, k15).
+1774788911: Client f907f0d70f68489eaef6464f326786ea [172.18.0.1:45504] disconnected: connection closed by client.
+1774788911: Client d04560246c2842c9a7d3fc768fe12a34 [172.18.0.1:60116] disconnected: connection closed by client.
+1774788928: New connection from 172.18.0.1:46664 on port 1883.
+1774788928: New client connected from 172.18.0.1:46664 as 3e8b4953f314493cb71c0c7bb6e7e8ab (p5, c1, k15).
+1774788932: New connection from 172.18.0.1:60696 on port 1883.
+1774788932: New client connected from 172.18.0.1:60696 as d9ceb86ed576467c9f1733fc7590f427 (p5, c1, k15).
+1774788975: Client d9ceb86ed576467c9f1733fc7590f427 [172.18.0.1:60696] disconnected: connection closed by client.
+1774788975: Client 3e8b4953f314493cb71c0c7bb6e7e8ab [172.18.0.1:46664] disconnected: connection closed by client.
+1774789018: New connection from 172.18.0.1:44136 on port 1883.
+1774789018: New client connected from 172.18.0.1:44136 as 0a25f57d498440f2a7aba5f99e1ac617 (p5, c1, k15).
+1774789031: New connection from 172.18.0.1:55446 on port 1883.
+1774789031: New client connected from 172.18.0.1:55446 as 62627316d7ae45c9a241bea6bfb89c33 (p5, c1, k15).
+1774789046: Client 62627316d7ae45c9a241bea6bfb89c33 [172.18.0.1:55446] disconnected: connection closed by client.
+1774789046: Client 0a25f57d498440f2a7aba5f99e1ac617 [172.18.0.1:44136] disconnected: connection closed by client.
+1774789059: New connection from 172.18.0.1:38972 on port 1883.
+1774789059: New client connected from 172.18.0.1:38972 as fd876dd377a54980af9a863b543972fe (p5, c1, k15).
+1774789068: New connection from 172.18.0.1:35542 on port 1883.
+1774789068: New client connected from 172.18.0.1:35542 as 9455d7e4d73d4405a0c5ca1541f8cc00 (p5, c1, k15).
+1774789107: Client 9455d7e4d73d4405a0c5ca1541f8cc00 [172.18.0.1:35542] disconnected: connection closed by client.
+1774789107: Client fd876dd377a54980af9a863b543972fe [172.18.0.1:38972] disconnected: connection closed by client.
+1774789116: New connection from 172.18.0.1:40494 on port 1883.
+1774789116: New client connected from 172.18.0.1:40494 as ca454171156542758ea8d0d00d66a7d7 (p5, c1, k15).
+1774789127: New connection from 172.18.0.1:45074 on port 1883.
+1774789127: New client connected from 172.18.0.1:45074 as 77f4a847fdae4408b5b651be8230d42c (p5, c1, k15).
+1774789158: Client ca454171156542758ea8d0d00d66a7d7 [172.18.0.1:40494] disconnected: connection closed by client.
+1774789158: Client 77f4a847fdae4408b5b651be8230d42c [172.18.0.1:45074] disconnected: connection closed by client.
+1774789255: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774791056: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774794636: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774796436: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774799573: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774801374: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774803522: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774805323: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774808112: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774815982: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774817783: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774819583: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774821384: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774871556: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774873357: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774875158: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774876959: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774878760: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774881005: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774882806: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774884607: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774886408: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774888509: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774891800: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774893600: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774902588: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774904388: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774914128: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774943296: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774945097: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774954120: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774955921: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774957721: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774959943: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774978601: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774984906: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774986707: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774992588: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774994389: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774996189: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774997990: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1774999791: Saving in-memory database to /mosquitto/data//mosquitto.db.
+1775037561: Saving in-memory database to /mosquitto/data//mosquitto.db.

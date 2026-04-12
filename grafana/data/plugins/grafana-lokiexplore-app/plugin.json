@@ -37,8 +37,8 @@
                 "path": "img/table.png"
             }
         ],
-        "version": "2.0.0",
-        "updated": "2026-03-19",
+        "version": "2.0.3",
+        "updated": "2026-04-09",
         "links": [
             {
                 "name": "Github",
@@ -68,23 +68,18 @@
             "exposedComponents": [
                 "grafana-adaptivelogs-app/temporary-exemptions/v1",
                 "grafana-lokiexplore-app/embedded-logs-exploration/v1",
-                "grafana-asserts-app/insights-timeline-widget/v1",
                 "grafana/add-to-dashboard-form/v1",
-                "grafana/query-library-context/v1"
+                "grafana/query-library-context/v1",
+                "grafana/alerting/create-alert-from-panel/v1"
             ]
         }
     },
     "preload": true,
+    "languages": [
+        "en-US"
+    ],
     "extensions": {
-        "addedComponents": [
-            {
-                "targets": [
-                    "grafana-asserts-app/insights-timeline-widget/v1"
-                ],
-                "title": "Insights Timeline Widget",
-                "description": "Widget for displaying insights timeline in other apps"
-            }
-        ],
+        "addedComponents": [],
         "addedFunctions": [
             {
                 "targets": [

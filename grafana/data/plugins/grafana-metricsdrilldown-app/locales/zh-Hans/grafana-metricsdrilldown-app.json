@@ -94,6 +94,25 @@
   "inline-banner": {
     "unknown-error": "未知错误！"
   },
+  "kg-annotations": {
+    "layer": {
+      "name": ""
+    },
+    "query": {
+      "name": ""
+    },
+    "severity": {
+      "critical": "",
+      "info": "",
+      "warning": ""
+    },
+    "toggle": {
+      "description": "",
+      "disabled-tooltip": "",
+      "label": "",
+      "learn-more": ""
+    }
+  },
   "labels-datasource": {
     "none-option": "（无）",
     "test-success": "确定"
@@ -315,8 +334,6 @@
       "recent-metrics-description": "根据开始采集的时间筛选指标",
       "rules-filters": "规则筛选条件",
       "rules-filters-description": "筛选指标和录制规则",
-      "settings": "设置",
-      "settings-description": "",
       "suffix-filters": "后缀筛选条件",
       "suffix-filters-description": "根据名称后缀筛选指标"
     }

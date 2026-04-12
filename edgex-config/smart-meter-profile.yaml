@@ -1,0 +1,52 @@
+name: "smart-meter"
+manufacturer: "Dusan Sotirov"
+model: "Dataset Smart Meter"
+labels:
+  - "rest"
+  - "energy"
+  - "smart-meter"
+description: "REST device profile for simulated household energy readings"
+
+deviceResources:
+  - name: globalActivePower
+    description: "Global active power in kilowatts"
+    properties:
+      valueType: "Float64"
+      readWrite: "R"
+      mediaType: "text/plain"
+
+  - name: voltage
+    description: "Voltage in volts"
+    properties:
+      valueType: "Float64"
+      readWrite: "R"
+      mediaType: "text/plain"
+
+  - name: globalIntensity
+    description: "Global intensity in amperes"
+    properties:
+      valueType: "Float64"
+      readWrite: "R"
+      mediaType: "text/plain"
+
+  - name: loadShedSwitch
+    description: "Switch used for load shedding command"
+    properties:
+      valueType: "Bool"
+      readWrite: "RW"
+      mediaType: "text/plain"
+
+deviceCommands:
+  - name: AllReadings
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+      - deviceResource: globalActivePower
+      - deviceResource: voltage
+      - deviceResource: globalIntensity
+
+  - name: LoadShedSwitch
+    readWrite: "RW"
+    isHidden: false
+    resourceOperations:
+      - deviceResource: loadShedSwitch

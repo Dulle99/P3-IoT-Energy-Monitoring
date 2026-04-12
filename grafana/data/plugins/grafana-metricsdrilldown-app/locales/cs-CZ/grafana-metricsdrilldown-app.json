@@ -97,6 +97,25 @@
   "inline-banner": {
     "unknown-error": "Neznámá chyba!"
   },
+  "kg-annotations": {
+    "layer": {
+      "name": ""
+    },
+    "query": {
+      "name": ""
+    },
+    "severity": {
+      "critical": "",
+      "info": "",
+      "warning": ""
+    },
+    "toggle": {
+      "description": "",
+      "disabled-tooltip": "",
+      "label": "",
+      "learn-more": ""
+    }
+  },
   "labels-datasource": {
     "none-option": "(žádné)",
     "test-success": "OK"
@@ -327,8 +346,6 @@
       "recent-metrics-description": "Filtrovat metriky na základě toho, kdy začaly být přijímány",
       "rules-filters": "Filtry pravidel",
       "rules-filters-description": "Filtrovat metriky a pravidla nahrávání",
-      "settings": "Nastavení",
-      "settings-description": "",
       "suffix-filters": "Filtry přípon",
       "suffix-filters-description": "Filtrovat metriky na základě jejich přípony názvu"
     }

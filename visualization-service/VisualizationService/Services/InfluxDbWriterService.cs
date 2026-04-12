@@ -1,8 +1,11 @@
 ﻿using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
+using System.Globalization;
 using VisualizationService.Configuration;
+using VisualizationService.Dtos;
 using VisualizationService.DTOs;
+using VisualizationService.Utilities;
 
 namespace VisualizationService.Services
 {
@@ -17,29 +20,42 @@ namespace VisualizationService.Services
             _settings = configuration.GetSection("InfluxDb").Get<InfluxDbSettings>() ?? new InfluxDbSettings();
         }
 
-        public async Task WriteAsync(PowerConsumptionMessage message)
+        public async Task WriteReadingAsync(EdgeXReading reading)
         {
             try
             {
+                if(!ParsingUtility.TryMapFieldName(reading.ResourceName, out var fieldName))
+                    { _logger.LogWarning("Unrecognized resource name {ResourceName} for device {DeviceName}", reading.ResourceName, reading.DeviceName);
+                      return;
+                }
+                if(!double.TryParse(reading.Value,NumberStyles.Float,CultureInfo.InvariantCulture, out var numericValue))
+                {
+                    _logger.LogWarning("Failed to parse value {Value} for resource {ResourceName} of device {DeviceName}", reading.Value, reading.ResourceName, reading.DeviceName);
+                    return;
+                }
+
                 using var client = new InfluxDBClient(_settings.Url, _settings.Token);
                 var writeApi = client.GetWriteApiAsync();
 
+                var timestamp = ParsingUtility.ConvertUnixNanosecondsToDateTime(reading.Origin);
+
                 var point = PointData
                     .Measurement("energy_readings")
-                    .Tag("deviceId", message.DeviceId)
-                    .Field("globalActivePower", message.GlobalActivePower)
-                    .Field("voltage", message.Voltage)
-                    .Field("globalIntensity", message.GlobalIntensity)
-                    .Timestamp(message.Timestamp, WritePrecision.S);
+                    .Tag("deviceId", reading.DeviceName)
+                    .Field(fieldName, numericValue)
+                    .Timestamp(timestamp, WritePrecision.Ns);
                 
                 await writeApi.WritePointAsync(point, _settings.Bucket, _settings.Org);
 
-                _logger.LogInformation("Successfully wrote data to InfluxDB for device {DeviceId} at {Timestamp}", message.DeviceId, message.Timestamp);
+                _logger.LogInformation("Successfully wrote reading for device {DeviceName}, resource {ResourceName} to InfluxDB", reading.DeviceName, reading.ResourceName);
+
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to write data to InfluxDB");
             }
         }
+
+
     }
 }

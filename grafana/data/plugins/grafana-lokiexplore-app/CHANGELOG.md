@@ -1,5 +1,65 @@
 # Changelog
 
+## 2.0.3
+
+##### Chores
+
+* **i18n:**
+  *  update translation keys to represent usage (#1837) (528e86e7)
+  *  enable eslint rules and translate all user-facing strings (#1833) (59041da0)
+
+##### Documentation Changes
+
+*  Add permissions info (#1838) (d2ecb3e8)
+
+##### Bug Fixes
+
+* **Feature Flags:**  remove logsPanelControls (#1844) (47ad21e9)
+* **Config:**  initialize feature flags in the configuration page (#1843) (a7942b72)
+
+##### Performance Improvements
+
+* **i18n:**  prevent loading en-US translations at runtime (#1841) (c7579309)
+
+
+## 2.0.2
+
+##### Chores
+
+* **ErrorStates:**  use EmptyState remove GrotError, translate (#1827) (287dfc26)
+* **i18n:**  add @grafana/i18n infrastructure (#1814) (e09c0823)
+
+##### New Features
+
+*  add Knowledge Graph insights annotations to timeseries (#1819) (4463f560)
+* **alerts:**  add log panel alerts (#1822) (16f1fc8f)
+
+##### Bug Fixes
+
+* **Breakdown Search:**  Fix visual overflow (#1832) (decc4ffd)
+* **insights:**  use namespaced goff flag for KG annotations (#1831) (70f24b69)
+* **cve:**  lodash and brace-expansion (#1829) (828ac54d)
+
+
+## 2.0.1
+
+##### Chores
+
+* **deps:**  update dependency serialize-javascript to v7.0.5 [security] (#1820) (07cbaadc)
+* **drilldown:**  run drilldown apps together locally (#1748) (6607b9c1)
+* **cve:**  undici resolutions (#1806) (1c9a3897)
+* **GOFF:**  update all feature flags to goff (#1810) (11ae7a6b)
+
+##### Bug Fixes
+
+* **renonvate:**  prCreation: not-pending (#1821) (84987dce)
+* **goff:**  use appSubUrl in the base path of the api call (#1818) (4099e5be)
+* **e2e:**  stabilize flaky savedSearches and exploreServices tests (#1816) (9efd0df6)
+* **links:**  improve escaping of the primary label (#1805) (48b460f4)
+* **ServiceSelection:**  Reset scene when changing tabs (#1809) (834b7de5)
+* **deps:**  update module google.golang.org/grpc to v1.79.3 [security] (#1808) (e302ea8f)
+
+
 ## 2.0.0
 
 ##### Chores

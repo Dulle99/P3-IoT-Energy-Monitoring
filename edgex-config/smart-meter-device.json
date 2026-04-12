@@ -1,0 +1,16 @@
+[
+  {
+    "apiVersion": "v3",
+    "device": {
+      "name": "smart-meter-1",
+      "description": "Simulated smart meter device for EdgeX energy monitoring project",
+      "adminState": "UNLOCKED",
+      "operatingState": "UP",
+      "serviceName": "device-rest",
+      "profileName": "smart-meter",
+      "protocols": {
+        "other": {}
+      }
+    }
+  }
+]
