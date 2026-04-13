@@ -1,4 +1,5 @@
-﻿using MonitoringService.Dtos;
+﻿using MonitoringService.Configuration;
+using MonitoringService.Dtos;
 using MQTTnet;
 using System.Text;
 using System.Text.Json;
@@ -8,16 +9,18 @@ namespace MonitoringService.Services
     public class MqttMonitoringSubscribeService : BackgroundService
     {
         private readonly ILogger<MqttMonitoringSubscribeService> _logger;
+        private readonly MqttSettings _mqttSettings;
 
         private const string TargetDeviceName = "smart-meter-1";
 
         private readonly MonitoringRuleEngine _ruleEngine;
         private IMqttClient? _mqttClient;
 
-        public MqttMonitoringSubscribeService(ILogger<MqttMonitoringSubscribeService> logger, MonitoringRuleEngine ruleEngine)
+        public MqttMonitoringSubscribeService(ILogger<MqttMonitoringSubscribeService> logger, MonitoringRuleEngine ruleEngine, IConfiguration config)
         {
             _logger = logger;
             _ruleEngine = ruleEngine;
+            _mqttSettings = config.GetSection("Mqtt").Get<MqttSettings>() ?? new MqttSettings();
         }
 
 
@@ -82,16 +85,16 @@ namespace MonitoringService.Services
             };
 
             var options = new MqttClientOptionsBuilder()
-                .WithTcpServer("localhost", 1883)
+                .WithTcpServer(_mqttSettings.Host, _mqttSettings.Port)
                 .Build();
 
             try
             {
                 await _mqttClient.ConnectAsync(options, stoppingToken);
-                _logger.LogInformation("MonitoringService connected to MQTT broker.");
+                _logger.LogInformation("MonitoringService connected to MQTT broker. {host}:{port}", _mqttSettings.Host, _mqttSettings.Port);
 
-                await _mqttClient.SubscribeAsync("edgex/events/#", cancellationToken: stoppingToken);
-                _logger.LogInformation("MonitoringService subscribed to topic edgex/events/#.");
+                await _mqttClient.SubscribeAsync(_mqttSettings.Topic, cancellationToken: stoppingToken);
+                _logger.LogInformation("MonitoringService subscribed to {topic}", _mqttSettings.Topic);
             }
 
             catch (Exception ex)

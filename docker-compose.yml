@@ -1,14 +1,4 @@
-services:
-  mosquitto:
-    image: eclipse-mosquitto:2
-    container_name: mosquitto
-    ports:
-      - "1883:1883"
-    volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
-  
+services:  
   influxdb:
     image: influxdb:2.7
     container_name: influxdb
@@ -32,3 +22,45 @@ services:
       - "3000:3000"
     volumes:
       - ./grafana/data:/var/lib/grafana
+
+  visualization-service:
+    container_name: visualization-service
+    build:
+      context: .
+      dockerfile: visualization-service/VisualizationService/Dockerfile
+    ports:
+      - "8081:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Mqtt__Host: edgex-mqtt-broker
+      Mqtt__Port: 1883
+      Mqtt__Topic: edgex/events/#
+      InfluxDb__Url: http://influxdb:8086
+      InfluxDb__Token: super-secret-token
+      InfluxDb__Org: p3-org
+      InfluxDb__Bucket: energy-bucket
+    depends_on:
+      - influxdb
+    networks:
+      - default
+      - edgex-network
+  
+  monitoring-service:
+    container_name: monitoring-service
+    build:
+      context: .
+      dockerfile: monitoring-service/MonitoringService/Dockerfile
+    ports:
+      - "8082:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Mqtt__Host: edgex-mqtt-broker
+      Mqtt__Port: 1883
+      Mqtt__Topic: edgex/events/#
+    networks:
+      - edgex-network
+
+networks:
+  edgex-network:
+    external: true
+    name: edgex_edgex-network

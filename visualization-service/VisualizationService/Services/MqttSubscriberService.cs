@@ -1,6 +1,7 @@
 ﻿using MQTTnet;
 using System.Text;
 using System.Text.Json;
+using VisualizationService.Configuration;
 using VisualizationService.Dtos;
 using VisualizationService.DTOs;
 
@@ -10,14 +11,16 @@ namespace VisualizationService.Services
     {
         private const string TargetDeviceName = "smart-meter-1";
 
+        private readonly MqttSettings _mqttSettings;
         private readonly ILogger<MqttSubscriberService> _logger;
         private readonly InfluxDbWriterService _influxDbWriterService;
         private IMqttClient? _mqttClient;
 
-        public MqttSubscriberService(ILogger<MqttSubscriberService> logger, InfluxDbWriterService influxDbWritterService) 
+        public MqttSubscriberService(ILogger<MqttSubscriberService> logger, InfluxDbWriterService influxDbWritterService, IConfiguration conf) 
         { 
             _logger = logger;
             _influxDbWriterService = influxDbWritterService;
+            _mqttSettings = conf.GetSection("Mqtt").Get<MqttSettings>() ?? new MqttSettings();
 
         }
 
@@ -72,16 +75,16 @@ namespace VisualizationService.Services
 
             #region MQTT Client Connection and Subscription
             var options = new MqttClientOptionsBuilder()
-                .WithTcpServer("localhost", 1883)
+                .WithTcpServer(_mqttSettings.Host, _mqttSettings.Port)
                 .Build();
 
             try
             {
                 await _mqttClient.ConnectAsync(options, stoppingToken);
-                _logger.LogInformation("Connected to MQTT broker at localhost:1883");
+                _logger.LogInformation("Connected to MQTT broker at {host}:{port}", _mqttSettings.Host, _mqttSettings.Port);
 
-                await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic("edgex/events/#").Build(), stoppingToken);
-                _logger.LogInformation("Subscribed to topic 'edgex/events/#'");
+                await _mqttClient.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(_mqttSettings.Topic).Build(), stoppingToken);
+                _logger.LogInformation("VisualizationService subscribed na topic: {Topic}", _mqttSettings.Topic);
             }
             catch (Exception ex)
             {
