@@ -23,6 +23,22 @@ services:
     volumes:
       - ./grafana/data:/var/lib/grafana
 
+  sensor-simulator:
+    container_name: sensor-simulator
+    build:
+      context: .
+      dockerfile: sensor-simulator/SensorSimulator/Dockerfile
+    environment:
+      Dataset__FilePath: /data/household_power_consumption_sample.txt
+      Dataset__MaxReadings: 50
+      Dataset__DelayMs: 2000
+      EdgeX__BaseUrl: http://edgex-device-rest:59986/api/v3/resource
+      EdgeX__DeviceName: smart-meter-1
+    volumes:
+      - ./dataset:/data:ro
+    networks:
+      - edgex-network
+
   visualization-service:
     container_name: visualization-service
     build:

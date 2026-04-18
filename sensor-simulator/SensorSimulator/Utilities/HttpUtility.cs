@@ -9,10 +9,8 @@ namespace SensorSimulator.Utilities
 {
     public static class HttpUtility
     {
-        public static async Task SendingReadingsToEdgeXAsync(HttpClient httpClient, PowerConsumptionReading reading)
+        public static async Task SendingReadingsToEdgeXAsync(string baseUrl, HttpClient httpClient, PowerConsumptionReading reading)
         {
-            const string baseUrl = "http://localhost:59986/api/v3/resource/smart-meter-1";
-
             await PostPlainTextAsync(httpClient, $"{baseUrl}/globalActivePower", reading.GlobalActivePower.ToString(CultureInfo.InvariantCulture));
             await PostPlainTextAsync(httpClient, $"{baseUrl}/voltage", reading.Voltage.ToString(CultureInfo.InvariantCulture));
             await PostPlainTextAsync(httpClient, $"{baseUrl}/globalIntensity", reading.GlobalIntensity.ToString(CultureInfo.InvariantCulture));
