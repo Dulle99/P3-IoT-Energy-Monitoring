@@ -10,6 +10,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton<MonitoringRuleEngine>();
 builder.Services.AddHostedService<MqttMonitoringSubscribeService>();
+builder.Services.AddHttpClient<EdgeXCommandService>();
 
 var app = builder.Build();
 

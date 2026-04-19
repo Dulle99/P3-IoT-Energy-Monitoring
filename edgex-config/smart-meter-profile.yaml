@@ -34,7 +34,7 @@ deviceResources:
     properties:
       valueType: "Bool"
       readWrite: "RW"
-      mediaType: "application/json"
+      mediaType: "text/plain"
 
 deviceCommands:
   - name: AllReadings

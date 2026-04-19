@@ -11,8 +11,8 @@ namespace MonitoringService.Services
 
         private const string TargetDeviceName = "smart-meter-1";
         private const string TargetResourceName = "globalActivePower";
-        private const double PowerTreshold = 4;
-        private const int RequiredConsecutiveReadings = 2;
+        private const double PowerTreshold = 4.5;
+        private const int RequiredConsecutiveReadings = 3;
 
         private int _consecutiveHighPowerReadings = 0;
 

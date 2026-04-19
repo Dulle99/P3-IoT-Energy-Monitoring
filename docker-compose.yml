@@ -75,6 +75,7 @@ services:
       Mqtt__Host: edgex-mqtt-broker
       Mqtt__Port: 1883
       Mqtt__Topic: edgex/events/#
+      CoreCommand__BaseUrl: http://edgex-core-command:59882
     networks:
       - edgex-network
 

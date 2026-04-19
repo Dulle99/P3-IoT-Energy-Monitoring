@@ -10,16 +10,18 @@ namespace MonitoringService.Services
     {
         private readonly ILogger<MqttMonitoringSubscribeService> _logger;
         private readonly MqttSettings _mqttSettings;
+        private readonly EdgeXCommandService _edgeXCommandService;
 
         private const string TargetDeviceName = "smart-meter-1";
 
         private readonly MonitoringRuleEngine _ruleEngine;
         private IMqttClient? _mqttClient;
 
-        public MqttMonitoringSubscribeService(ILogger<MqttMonitoringSubscribeService> logger, MonitoringRuleEngine ruleEngine, IConfiguration config)
+        public MqttMonitoringSubscribeService(ILogger<MqttMonitoringSubscribeService> logger, MonitoringRuleEngine ruleEngine, EdgeXCommandService edgeXCommandService, IConfiguration config)
         {
             _logger = logger;
             _ruleEngine = ruleEngine;
+            _edgeXCommandService = edgeXCommandService;
             _mqttSettings = config.GetSection("Mqtt").Get<MqttSettings>() ?? new MqttSettings();
         }
 
@@ -29,13 +31,13 @@ namespace MonitoringService.Services
             var factory = new MqttClientFactory();
             _mqttClient = factory.CreateMqttClient();
 
-            _mqttClient.ApplicationMessageReceivedAsync += e =>
+            _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
                 try
                 {
                     var rawPayloadMessage = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
 
-                    _logger.LogInformation("Received MQTT message on topic {topic}: {message}", 
+                    _logger.LogDebug("Received MQTT message on topic {topic}: {message}", 
                         e.ApplicationMessage.Topic,
                         rawPayloadMessage);
 
@@ -45,22 +47,22 @@ namespace MonitoringService.Services
                     {
                         _logger.LogWarning("Failed to extract EdgeXEvent from MQTT message: {rawMessage}",
                             rawPayloadMessage);
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     if(!string.Equals(edgeXEvent.DeviceName, TargetDeviceName, StringComparison.OrdinalIgnoreCase))
                     {
-                        _logger.LogInformation("[IGNORING] - Received event from device {deviceName}, which does not match target device {targetDevice}.",
+                        _logger.LogDebug("[IGNORING] - Received event from device {deviceName}, which does not match target device {targetDevice}.",
                             edgeXEvent.DeviceName, 
                             TargetDeviceName);
-                        return Task.CompletedTask;
+                        return;
                     }
 
-                    _logger.LogInformation("[PARSED] - EdgeXEvent from device {deviceName} with {readingCount} readings.", edgeXEvent.DeviceName, edgeXEvent.Readings.Count);
+                    _logger.LogDebug("[PARSED] - EdgeXEvent from device {deviceName} with {readingCount} readings.", edgeXEvent.DeviceName, edgeXEvent.Readings.Count);
 
                     foreach(var reading in edgeXEvent.Readings)
                     {
-                        _logger.LogInformation("[READING] - Evaluating reading {resourceName} with value {value} from device {deviceName}.",
+                        _logger.LogDebug("[READING] - Evaluating reading {resourceName} with value {value} from device {deviceName}.",
                             reading.ResourceName,
                             reading.Value,
                             reading.DeviceName);
@@ -73,6 +75,8 @@ namespace MonitoringService.Services
                                 command.CommandName, 
                                 command.DeviceId, 
                                 command.Reason);
+
+                            await _edgeXCommandService.SendLoadShedCommandAsync(command.DeviceId, stoppingToken);
                         }
                     }
                 }
@@ -81,7 +85,7 @@ namespace MonitoringService.Services
                     _logger.LogError(ex, "Error processing MQTT message");
                 }
 
-                return Task.CompletedTask;
+                return;
             };
 
             var options = new MqttClientOptionsBuilder()

@@ -4,13 +4,13 @@
     {
         public readonly object _lock = new();
 
-        public bool LoadShedEnable
+        public bool LoadShedEnabled
         {
             get
             {
                 lock (_lock)
                 {
-                    return loadShedEnable;
+                    return loadShedEnabled;
 
                 }
             }
@@ -18,12 +18,12 @@
             {
                 lock (_lock)
                 {
-                    loadShedEnable = value;
+                    loadShedEnabled = value;
                 }
             }
 
         }
 
-        private bool loadShedEnable;
+        private bool loadShedEnabled;
     }
 }

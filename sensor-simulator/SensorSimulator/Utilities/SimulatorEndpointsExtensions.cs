@@ -7,14 +7,21 @@ namespace SensorSimulator.Utilities
     {
         public static WebApplication MapSimulatorEndpoints(this WebApplication app)
         {
-            app.MapPut("/api/LoadShedSwitch", (LoadShedCommandRequest request, SimulatorCommandService commandService) =>
+            app.MapPut("/api/LoadShedSwitch", async (HttpRequest request, SimulatorCommandService commandService) =>
             {
-                if (string.IsNullOrEmpty(request.LoadShedSwitch))
+                Console.WriteLine($"Incoming Content-Type: {request.ContentType}");
+
+                using var reader = new StreamReader(request.Body);
+                var rawBody = await reader.ReadToEndAsync();
+
+                if (string.IsNullOrEmpty(rawBody))
                 {
-                    return Results.BadRequest("LoadShedSwatch is required.");
+                    return Results.BadRequest("Request body is empty.");
                 }
 
-                var result = commandService.HandleLoadShedCommand(request);
+                var value = rawBody.Trim('"'); // Remove potential surrounding quotes
+
+                var result = commandService.HandleLoadShedCommand(value);
                 return Results.Ok(result);
             });
 

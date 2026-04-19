@@ -48,7 +48,7 @@ namespace SensorSimulator.Services
                 // Apply load shed if enabled in the simulator state
                 var reading = ApplyLoadShedIfNeeded(originalReading);
 
-                _logger.LogInformation(
+                _logger.LogDebug(
                     "Sending reading to EdgeX: {Timestamp} - {Power}",
                     reading.Timestamp,
                     reading.GlobalActivePower);
@@ -71,7 +71,7 @@ namespace SensorSimulator.Services
 
         private PowerConsumptionReading ApplyLoadShedIfNeeded(PowerConsumptionReading reading)
         {
-            if (!_simulatorState.LoadShedEnable)
+            if (!_simulatorState.LoadShedEnabled)
                 return reading;
 
             return  new PowerConsumptionReading
