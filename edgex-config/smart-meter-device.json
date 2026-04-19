@@ -9,7 +9,11 @@
       "serviceName": "device-rest",
       "profileName": "smart-meter",
       "protocols": {
-        "other": {}
+        "REST": {
+          "Host": "sensor-simulator",
+          "Port": "7070",
+          "Path": "api" 
+        }
       }
     }
   }

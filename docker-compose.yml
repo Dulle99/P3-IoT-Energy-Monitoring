@@ -34,6 +34,8 @@ services:
       Dataset__DelayMs: 2000
       EdgeX__BaseUrl: http://edgex-device-rest:59986/api/v3/resource
       EdgeX__DeviceName: smart-meter-1
+    ports:
+      - "7070:7070"
     volumes:
       - ./dataset:/data:ro
     networks:
