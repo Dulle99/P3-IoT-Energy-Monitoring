@@ -181,362 +181,301 @@ P3-IoT-Energy-Monitoring
 ├── docker-compose.yml
 └── README.md
 
-Technologies Used
------------------
+## Technologies Used
 
--   .NET 10
--   ASP.NET Core / Minimal API
--   EdgeX Foundry
--   MQTT
--   InfluxDB 2.x
--   Grafana
--   Docker / Docker Compose
--   C#
+- .NET 10
+- ASP.NET Core / Minimal API
+- EdgeX Foundry
+- MQTT
+- InfluxDB 2.x
+- Grafana
+- Docker / Docker Compose
+- C#
 
-* * * * *
-
-Prerequisites
--------------
+## Prerequisites
 
 Before running the system, make sure you have:
 
--   **Docker Desktop**
--   **Git**
--   optional: **.NET 10 SDK** if you want to run services locally outside Docker
+- Docker Desktop
+- Git
+- .NET 10 SDK *(optional, only if you want to run services locally outside Docker)*
 
 You also need a separate local clone of the **EdgeX Compose** repository.
 
-> Note: this project does **not** include the entire `edgex-compose` repository inside itself. EdgeX is started from a separate folder/repository.
+> **Note:** This project does **not** include the entire `edgex-compose` repository inside itself. EdgeX is started from a separate folder/repository.
 
-* * * * *
+## How to Run the System
 
-How to Run the System
----------------------
+### 1. Clone the Repositories
 
-1\. Clone the Repositories
---------------------------
-
-### Clone this project
-
+#### Clone this project
+```bash
 git clone https://github.com/Dulle99/P3-IoT-Energy-Monitoring.git
+```
 
-### Clone EdgeX Compose
-
-cd C:\Projects\
-git clone https://github.com/edgexfoundry/edgex-compose.git\
-cd edgex-compose\
+#### Clone EdgeX Compose
+```bash
+cd C:\Projects
+git clone https://github.com/edgexfoundry/edgex-compose.git
+cd edgex-compose
 git checkout v4.0
+```
 
-* * * * *
-
-2\. Start EdgeX Foundry
------------------------
+### 2. Start EdgeX Foundry
 
 From the `edgex-compose` folder:
 
-cd C:\Projects\edgex-compose\
-docker compose -f docker-compose-no-secty.yml up -d\
+```bash
+cd C:\Projects\edgex-compose
+docker compose -f docker-compose-no-secty.yml up -d
 docker compose -f docker-compose-no-secty.yml ps
+```
 
-* * * * *
+### 3. Verify EdgeX Health
 
-3\. Verify EdgeX Health
------------------------
-
-Invoke-RestMethod -Method Get -Uri "http://localhost:59986/api/v3/ping"\
-Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/ping"\
-Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/ping"\
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:59986/api/v3/ping"
+Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/ping"
+Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/ping"
 Invoke-RestMethod -Method Get -Uri "http://localhost:59882/api/v3/ping"
+```
 
 These endpoints correspond to:
 
--   `device-rest`
--   `core-metadata`
--   `core-data`
--   `core-command`
+- `device-rest`
+- `core-metadata`
+- `core-data`
+- `core-command`
 
 All of them should respond successfully.
 
-* * * * *
-
-4\. Register the Device Profile and Device
-------------------------------------------
+### 4. Register the Device Profile and Device
 
 If EdgeX was reset or started from a clean state, register the custom profile and device again.
 
-### Upload the device profile
-
+#### Upload the device profile
+```bash
 curl.exe -X POST -F "file=@C:/Projects/P3 IoT Energy Monitoring/edgex-config/smart-meter-profile.yaml" http://localhost:59881/api/v3/deviceprofile/uploadfile
+```
 
-### Create the device
-
+#### Create the device
+```bash
 curl.exe -X POST -H "Content-Type: application/json" --data-binary "@C:/Projects/P3 IoT Energy Monitoring/edgex-config/smart-meter-device.json" http://localhost:59881/api/v3/device
+```
 
-### Verify profile and device registration
-
-Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/deviceprofile/name/smart-meter"\
-Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/device/name/smart-meter-1"\
+#### Verify profile and device registration
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/deviceprofile/name/smart-meter"
+Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/device/name/smart-meter-1"
 Invoke-RestMethod -Method Get -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1"
+```
 
-* * * * *
-
-5\. Start the Project Services
-------------------------------
+### 5. Start the Project Services
 
 From the project root:
 
-cd "C:\Projects\P3 IoT Energy Monitoring"\
-docker compose up -d --build\
+```bash
+cd "C:\Projects\P3 IoT Energy Monitoring"
+docker compose up -d --build
 docker compose ps
+```
 
 Expected services:
 
--   `sensor-simulator`
--   `visualization-service`
--   `monitoring-service`
--   `influxdb`
--   `grafana`
+- `sensor-simulator`
+- `visualization-service`
+- `monitoring-service`
+- `influxdb`
+- `grafana`
 
-* * * * *
+### 6. Check Service Logs
 
-6\. Check Service Logs
-----------------------
-
-### SensorSimulator
-
+#### SensorSimulator
+```bash
 docker compose logs -f sensor-simulator
+```
 
-### VisualizationService
-
+#### VisualizationService
+```bash
 docker compose logs -f visualization-service
+```
 
-### MonitoringService
-
+#### MonitoringService
+```bash
 docker compose logs -f monitoring-service
+```
 
-* * * * *
+### 7. Verify EdgeX Event Ingestion
 
-7\. Verify EdgeX Event Ingestion
---------------------------------
-
-Count events for the smart meter:
-
+#### Count events for the smart meter
+```powershell
 Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/event/count/device/name/smart-meter-1"
+```
 
-Read events for the smart meter:
-
+#### Read events for the smart meter
+```powershell
 Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/event/device/name/smart-meter-1"
+```
 
-* * * * *
+### 8. Verify InfluxDB
 
-8\. Verify InfluxDB
--------------------
-
-Health endpoint:
-
+#### Health endpoint
+```powershell
 Invoke-RestMethod -Method Get -Uri "http://localhost:8086/health"
+```
 
-Open UI:
-
--   `http://localhost:8086`
+#### Open UI
+```text
+http://localhost:8086
+```
 
 Expected bucket:
 
--   `energy-bucket`
+- `energy-bucket`
 
 Expected measurement:
 
--   `energy_readings`
+- `energy_readings`
 
 Expected fields:
 
--   `globalActivePower`
--   `voltage`
--   `globalIntensity`
+- `globalActivePower`
+- `voltage`
+- `globalIntensity`
 
-* * * * *
-
-9\. Verify Grafana
-------------------
+### 9. Verify Grafana
 
 Open:
 
--   `http://localhost:3000`
+```text
+http://localhost:3000
+```
 
 Check that the dashboard displays:
 
--   `globalActivePower`
--   `voltage`
--   `globalIntensity`
+- `globalActivePower`
+- `voltage`
+- `globalIntensity`
 
-### Important time note
+#### Important time note
 
-Originally the project used historical dataset timestamps.\
+Originally, the project used historical dataset timestamps.  
 Now the system stores **EdgeX event origin timestamps**, which are recent/current.
 
 Because of that, Grafana should use a recent time range such as:
 
--   **Last 5 minutes**
--   **Last 15 minutes**
--   **Last 1 hour**
+- Last 5 minutes
+- Last 15 minutes
+- Last 1 hour
 
-If Grafana shows no data, the first thing to check is the dashboard time range.
+> If Grafana shows no data, the first thing to check is the dashboard time range.
 
-* * * * *
+### 10. Verify Core Command Manually
 
-10\. Verify Core Command Manually
----------------------------------
-
-### Send `LoadShedSwitch = true` through EdgeX
-
-$body = @{\
-    loadShedSwitch = "true"\
+#### Send `LoadShedSwitch = true` through EdgeX
+```powershell
+$body = @{
+    loadShedSwitch = "true"
 } | ConvertTo-Json
 
-Invoke-RestMethod `\
-  -Method Put `\
-  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `\
-  -ContentType "application/json" `\
+Invoke-RestMethod `
+  -Method Put `
+  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `
+  -ContentType "application/json" `
   -Body $body
+```
 
-### Send `LoadShedSwitch = false`
-
-$body = @{\
-    loadShedSwitch = "false"\
+#### Send `LoadShedSwitch = false`
+```powershell
+$body = @{
+    loadShedSwitch = "false"
 } | ConvertTo-Json
 
-Invoke-RestMethod `\
-  -Method Put `\
-  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `\
-  -ContentType "application/json" `\
+Invoke-RestMethod `
+  -Method Put `
+  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `
+  -ContentType "application/json" `
   -Body $body
+```
 
 Expected result:
 
--   EdgeX returns `statusCode: 200`
--   `sensor-simulator` receives the command
--   simulator toggles load shedding state
+- EdgeX returns `statusCode: 200`
+- `sensor-simulator` receives the command
+- simulator toggles load shedding state
 
-* * * * *
-
-Expected End-to-End Behavior
-----------------------------
+## Expected End-to-End Behavior
 
 When the system is working correctly:
 
-1.  `sensor-simulator` reads the dataset and sends readings to EdgeX
-2.  EdgeX registers the readings and emits events on `edgex/events/#`
-3.  `visualization-service` consumes those events and writes values into InfluxDB
-4.  Grafana shows the readings in near real time
-5.  `monitoring-service` detects repeated threshold violations
-6.  `monitoring-service` sends `LoadShedSwitch` through EdgeX Core Command
-7.  EdgeX forwards the command back to `sensor-simulator`
-8.  `sensor-simulator` enables load shedding
-9.  future values are reduced
+1. `sensor-simulator` reads the dataset and sends readings to EdgeX
+2. EdgeX registers the readings and emits events on `edgex/events/#`
+3. `visualization-service` consumes those events and writes values into InfluxDB
+4. Grafana shows the readings in near real time
+5. `monitoring-service` detects repeated threshold violations
+6. `monitoring-service` sends `LoadShedSwitch` through EdgeX Core Command
+7. EdgeX forwards the command back to `sensor-simulator`
+8. `sensor-simulator` enables load shedding
+9. Future values are reduced
 
-* * * * *
-
-Command Flow
-------------
+## Command Flow
 
 ### Direct command to SensorSimulator
 
+```powershell
 Invoke-RestMethod -Method Put -Uri "http://localhost:7070/api/LoadShedSwitch" -ContentType "application/json" -Body '{"loadShedSwitch":"true"}'
+```
 
 This is useful for testing the simulator itself without going through EdgeX.
 
 ### Full command through EdgeX
 
-$body = @{\
-    loadShedSwitch = "true"\
+```powershell
+$body = @{
+    loadShedSwitch = "true"
 } | ConvertTo-Json
 
-Invoke-RestMethod `\
-  -Method Put `\
-  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `\
-  -ContentType "application/json" `\
+Invoke-RestMethod `
+  -Method Put `
+  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `
+  -ContentType "application/json" `
   -Body $body
+```
 
 This is the real project path:
 
--   MonitoringService uses this path automatically
--   EdgeX forwards it through `device-rest`
--   SensorSimulator receives it as the simulated end device
+- `MonitoringService` uses this path automatically
+- EdgeX forwards it through `device-rest`
+- `SensorSimulator` receives it as the simulated end device
 
-* * * * *
+## Grafana Queries
 
-Grafana Queries
----------------
+### Example query for `globalActivePower`
 
-Example query for `globalActivePower`:
-
-from(bucket: "energy-bucket")\
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\
-  |> filter(fn: (r) => r["_measurement"] == "energy_readings")\
-  |> filter(fn: (r) => r["_field"] == "globalActivePower")\
+```flux
+from(bucket: "energy-bucket")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "energy_readings")
+  |> filter(fn: (r) => r["_field"] == "globalActivePower")
   |> filter(fn: (r) => r["deviceId"] == "smart-meter-1")
+```
 
-Example query for `voltage`:
+### Example query for `voltage`
 
-from(bucket: "energy-bucket")\
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\
-  |> filter(fn: (r) => r["_measurement"] == "energy_readings")\
-  |> filter(fn: (r) => r["_field"] == "voltage")\
+```flux
+from(bucket: "energy-bucket")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "energy_readings")
+  |> filter(fn: (r) => r["_field"] == "voltage")
   |> filter(fn: (r) => r["deviceId"] == "smart-meter-1")
+```
 
-Example query for `globalIntensity`:
+### Example query for `globalIntensity`
 
-from(bucket: "energy-bucket")\
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\
-  |> filter(fn: (r) => r["_measurement"] == "energy_readings")\
-  |> filter(fn: (r) => r["_field"] == "globalIntensity")\
+```flux
+from(bucket: "energy-bucket")
+  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+  |> filter(fn: (r) => r["_measurement"] == "energy_readings")
+  |> filter(fn: (r) => r["_field"] == "globalIntensity")
   |> filter(fn: (r) => r["deviceId"] == "smart-meter-1")
-
-* * * * *
-
-Troubleshooting
----------------
-
-### EdgeX returns `Unauthorized`
-
-Reset and restart non-secure EdgeX:
-
-cd C:\Projects\edgex-compose\
-docker compose -f docker-compose-no-secty.yml down -v\
-docker compose -f docker-compose-no-secty.yml up -d
-
-Then register the profile and device again.
-
-### Device or profile missing after restart
-
-Re-register:
-
--   the custom device profile
--   the custom device
-
-### InfluxDB bucket not found
-
-Make sure the configured bucket is:
-
--   `energy-bucket`
-
-Also verify that `visualization-service` uses the same bucket in its environment variables.
-
-### Grafana shows no data
-
-Check:
-
--   InfluxDB contains points
--   dashboard time range is recent
--   Flux queries use `v.timeRangeStart` and `v.timeRangeStop`
-
-### Monitoring keeps sending the same command
-
-This can happen if the threshold is set too low for testing.\
-Example:
-
--   if threshold is `2`
--   and load shedding reduces power to `2.5`
--   then the system still sees readings above threshold
-
-For final testing, use realistic thresholds or ensure reduced readings go below the configured threshold.
+```
