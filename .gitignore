@@ -1,3 +1,10 @@
+# runtime / generated data
+grafana/data/
+influxdb/data/
+
+# optional
+*.log
+
 bin/
 obj/
 .vs/
