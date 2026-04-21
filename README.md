@@ -585,18 +585,6 @@ For final testing, use realistic thresholds or ensure reduced readings go below 
 
 ---
 
-## Future Improvements
-
-- move noisy logs to `Debug` level
-- clean up variable naming (`LoadShedEnable` -> `LoadShedEnabled`)
-- improve duplicate command suppression logic
-- add screenshots of Grafana and EdgeX flow
-- add architecture diagram
-- improve dashboard styling
-- optionally add a dedicated actuator service instead of combining actuator behavior into the simulator
-
----
-
 ## Final Notes
 
 This project demonstrates a full closed-loop IoT control pipeline:
