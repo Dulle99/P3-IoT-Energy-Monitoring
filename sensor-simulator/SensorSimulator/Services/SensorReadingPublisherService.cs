@@ -48,15 +48,15 @@ namespace SensorSimulator.Services
                 // Apply load shed if enabled in the simulator state
                 var reading = ApplyLoadShedIfNeeded(originalReading);
 
-                _logger.LogDebug(
+                /*_logger.LogDebug(
                     "Sending reading to EdgeX: {Timestamp} - {Power}",
                     reading.Timestamp,
-                    reading.GlobalActivePower);
+                    reading.GlobalActivePower);*/
 
                 try
                 {
                     await HttpUtility.SendingReadingsToEdgeXAsync(baseUrl, httpClient, reading);
-                    _logger.LogInformation("Successfully sent reading to EdgeX.");
+                    //_logger.LogInformation("Successfully sent reading to EdgeX.");
                 }
                 catch (Exception ex)
                 {
