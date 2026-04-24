@@ -13,3 +13,7 @@ obj/
 *.db
 TestResults/
 dataset/household_power_consumption.txt
+
+# External EdgeX repository cloned locally
+edgex-compose/
+edex-compose/
