@@ -15,15 +15,21 @@ namespace SensorSimulator.Services
 
         public object HandleLoadShedCommand(string value)
         {
-            var enabled = value.Equals("true", StringComparison.OrdinalIgnoreCase);
+            if (!bool.TryParse(value, out var enabled))
+            {
+                throw new ArgumentException("Invalid value for LoadShedSwitch. Expected 'true' or 'false'.");
+            }
+
             simulatorState.LoadShedEnabled = enabled;
 
-            logger.LogInformation("Load shed command received. LoadShedEnable set to {Enabled}", enabled);
+            logger.LogInformation(
+                "Load shed command received. LoadShedEnabled set to {Enabled}",
+                enabled);
 
             return new
             {
                 status = "accepted",
-                loadShedEnabled = enabled 
+                loadShedEnabled = enabled
             };
         }
     }

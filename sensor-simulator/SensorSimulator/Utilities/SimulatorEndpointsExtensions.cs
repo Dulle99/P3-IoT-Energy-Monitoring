@@ -21,8 +21,18 @@ namespace SensorSimulator.Utilities
 
                 var value = rawBody.Trim('"'); // Remove potential surrounding quotes
 
-                var result = commandService.HandleLoadShedCommand(value);
-                return Results.Ok(result);
+                try
+                {
+                    var result = commandService.HandleLoadShedCommand(value);
+                    return Results.Ok(result);
+                }
+                catch (ArgumentException ex)
+                {
+                    return Results.BadRequest(new
+                    {
+                        error = ex.Message
+                    });
+                }
             });
 
             return app;

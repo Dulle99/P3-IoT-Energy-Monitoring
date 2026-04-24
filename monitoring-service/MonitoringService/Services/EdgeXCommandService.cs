@@ -16,14 +16,17 @@ namespace MonitoringService.Services
             this.logger = logger;
             this.commandSettings = configuration.GetSection("CoreCommand").Get<CoreCommandSettings>() ?? new CoreCommandSettings();
         }
-
         public async Task SendLoadShedCommandAsync(string deviceName, CancellationToken cancellationToken = default)
+        {
+            await SendLoadShedCommandAsync(deviceName, true, cancellationToken);
+        }
+        public async Task SendLoadShedCommandAsync(string deviceName, bool enable, CancellationToken cancellationToken = default)
         {
             var url = $"{commandSettings.BaseUrl.TrimEnd('/')}/api/v3/device/name/{deviceName}/{commandSettings.CommandName}";
 
             var body = new Dictionary<string, string>
             {
-                [commandSettings.ResourceName] = commandSettings.TriggerValue
+                [commandSettings.ResourceName] = enable.ToString().ToLowerInvariant()
             };
 
             var json = System.Text.Json.JsonSerializer.Serialize(body);

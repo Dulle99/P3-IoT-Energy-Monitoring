@@ -8,7 +8,7 @@
 
         public string ResourceName { get; set; } = "globalActivePower";
 
-        public double Threshold { get; set; } = 2;
+        public double Threshold { get; set; } = 4.5;
 
         public int RequiredConsecutiveReadings { get; set; } = 3;
 
