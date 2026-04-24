@@ -8,6 +8,6 @@ namespace SensorSimulator.Configuration
     {
         public string FilePath { get; set; } = string.Empty;
         public int MaxReadings { get; set; } = 50;
-        public int DelayMs { get; set; } = 2000;
+        public int DelayMs { get; set; } = 5000;
     }
 }

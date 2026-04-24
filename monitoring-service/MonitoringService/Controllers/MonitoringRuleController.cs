@@ -49,13 +49,27 @@ namespace MonitoringService.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("reset-counter")]
         public IActionResult ResetCounter()
         {
             _ruleEngine.ResetCounter();
+
             return Ok(new
             {
-                Message = "Monitoring rule reset to default values."
+                message = "Monitoring rule counter reset successfully."
+            });
+        }
+
+        [HttpPost("reset-defaults")]
+        public IActionResult ResetToDefaults()
+        {
+            var defaultRule = _ruleState.ResetToDefaults();
+            _ruleEngine.ResetCounter();
+
+            return Ok(new
+            {
+                message = "Monitoring rule reset to default values.",
+                rule = defaultRule
             });
         }
     }

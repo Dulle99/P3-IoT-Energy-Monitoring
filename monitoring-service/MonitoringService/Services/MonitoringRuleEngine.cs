@@ -11,6 +11,7 @@ namespace MonitoringService.Services
         private readonly MonitoringRuleState _ruleState;
 
         private int _conescutiveHighPowerReadings = 0;
+        private bool _alarmAlreadyTriggered = false;
 
         public MonitoringRuleEngine(ILogger<MonitoringRuleEngine> logger, MonitoringRuleState ruleState)
         {
@@ -50,18 +51,25 @@ namespace MonitoringService.Services
             }
             else
             {
-                if (_conescutiveHighPowerReadings > 0)
+                if (_conescutiveHighPowerReadings > 0 || _alarmAlreadyTriggered)
                 {
                     _logger.LogInformation("Reading back to normal: {Value}. Resetting consecutive count.", readingValue);
                 }
                 _conescutiveHighPowerReadings = 0;
+                _alarmAlreadyTriggered= false;
                 return null;
             }
 
             if (_conescutiveHighPowerReadings >= rule.RequiredConsecutiveReadings)
             {
+                if (_alarmAlreadyTriggered) { 
+                    _logger.LogInformation("Alarm already triggered for this event. Skipping duplicate command.");
+                    return null;
+                }
+
                 {
                     _conescutiveHighPowerReadings = 0; // Reset after triggering command
+                    _alarmAlreadyTriggered = true; // Set flag to indicate alarm has been triggered
                     var command = new MonitoringCommand
                     {
                         DeviceId = reading.DeviceName,
@@ -80,6 +88,7 @@ namespace MonitoringService.Services
         public void ResetCounter()
         {
             _conescutiveHighPowerReadings = 0;
+            _alarmAlreadyTriggered= false;
             _logger.LogInformation("Consecutive high reading counter reset manually.");
         }
     }

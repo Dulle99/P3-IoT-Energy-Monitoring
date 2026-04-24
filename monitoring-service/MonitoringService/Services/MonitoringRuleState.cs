@@ -38,7 +38,7 @@ namespace MonitoringService.Services
 
                 if (request.Threshold.HasValue)
                 {
-                    if (request.Threshold < 0)
+                    if (request.Threshold <= 0)
                     {
                         throw new ArgumentException("Threshold must be non-negative.");
                     }
@@ -76,6 +76,14 @@ namespace MonitoringService.Services
             };
         }
 
+        public MonitoringRule ResetToDefaults()
+        {
+            lock (_lock)
+            {
+                _rule = new MonitoringRule();
+                return CloneRule(_rule);
+            }
+        }
 
     }
 }
