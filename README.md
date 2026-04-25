@@ -1,14 +1,15 @@
 # P3 IoT Energy Monitoring
 
-An IoT energy monitoring system built with **.NET**, **EdgeX Foundry**, **InfluxDB**, and **Grafana**.
+An IoT energy monitoring system built with **EdgeX Foundry**, **.NET**, **MQTT**, **InfluxDB**, **Grafana**, and **Docker Compose**.
 
-This project simulates household energy readings, sends them through **EdgeX Foundry**, visualizes them in **Grafana**, and performs automated monitoring and reaction when power consumption exceeds a configured threshold.
+The project simulates a smart electricity meter that reads real household power consumption data from a dataset file, sends those readings into EdgeX Foundry, stores them in InfluxDB, visualizes them in Grafana, and reacts automatically when power consumption exceeds a configured threshold.
 
 ---
 
 ## Table of Contents
 
 - [Problem Abstraction](#problem-abstraction)
+- [Dataset](#dataset)
 - [Project Goal](#project-goal)
 - [Architecture Overview](#architecture-overview)
 - [Main Components](#main-components)
@@ -17,141 +18,225 @@ This project simulates household energy readings, sends them through **EdgeX Fou
 - [Technologies Used](#technologies-used)
 - [Prerequisites](#prerequisites)
 - [How to Run the System](#how-to-run-the-system)
-  - [1. Clone the Repositories](#1-clone-the-repositories)
-  - [2. Start EdgeX Foundry](#2-start-edgex-foundry)
-  - [3. Verify EdgeX Health](#3-verify-edgex-health)
-  - [4. Register the Device Profile and Device](#4-register-the-device-profile-and-device)
-  - [5. Start the Project Services](#5-start-the-project-services)
-  - [6. Check Service Logs](#6-check-service-logs)
-  - [7. Verify EdgeX Event Ingestion](#7-verify-edgex-event-ingestion)
-  - [8. Verify InfluxDB](#8-verify-influxdb)
-  - [9. Verify Grafana](#9-verify-grafana)
-  - [10. Verify Core Command Manually](#10-verify-core-command-manually)
-- [Expected End-to-End Behavior](#expected-end-to-end-behavior)
-- [Command Flow](#command-flow)
-- [Grafana Queries](#grafana-queries)
+- [Useful URLs](#useful-urls)
+- [Monitoring REST API](#monitoring-rest-api)
+- [Grafana Dashboard](#grafana-dashboard)
+- [Testing the System](#testing-the-system)
 - [Troubleshooting](#troubleshooting)
-- [Future Improvements](#future-improvements)
+- [Final Notes](#final-notes)
 
 ---
 
 ## Problem Abstraction
 
-This project addresses the problem of **energy monitoring and automated reaction in a smart home environment**.
+The project models a simplified **smart home energy monitoring and control system**.
 
-The abstract problem is:
+In a real IoT environment, energy meters continuously produce readings such as active power, voltage, and current intensity. These readings must be collected, processed, stored, visualized, and monitored. When the system detects high consumption for a defined period of time, it should react by sending a command back to the device or actuator.
 
-- there is a source of energy readings,
-- readings must be ingested through an IoT middleware platform,
-- the system must store and visualize those readings,
-- the system must detect suspicious or undesirable consumption patterns,
-- once a configured condition is met, the system should automatically send a command that reduces future power usage.
+This project abstracts that problem as a closed-loop IoT workflow:
 
-In this implementation:
+```text
+measure -> ingest -> distribute -> store -> visualize -> monitor -> command -> react
+```
 
-- a simulator acts as a smart meter,
-- EdgeX Foundry acts as the IoT middleware,
-- a visualization microservice writes readings into a time-series database,
-- a monitoring microservice watches for repeated threshold violations,
-- a command is sent back through EdgeX,
-- the simulator changes its behavior and starts sending reduced values.
+The system does not only collect sensor data. It also performs an automated corrective action when high power consumption is detected.
 
-This demonstrates a complete closed-loop IoT workflow:
+---
 
-**measure -> detect -> decide -> command -> react**
+## Dataset
+
+The project uses the **Individual Household Electric Power Consumption** dataset.
+
+Dataset source:
+
+- Kaggle: https://www.kaggle.com/datasets/uciml/electric-power-consumption-data-set/data
+
+The original dataset contains measurements of electric power consumption in a household over time.
+
+For this project, a smaller sample file is included in the repository to keep the project lightweight and easy to run:
+
+```text
+dataset/household_power_consumption_sample.txt
+```
+
+Used dataset columns:
+
+- `Global_active_power`
+- `Voltage`
+- `Global_intensity`
+
+These values are mapped to EdgeX device resources:
+
+| Dataset column | EdgeX resource | Meaning |
+|---|---|---|
+| `Global_active_power` | `globalActivePower` | Household active power consumption in kW |
+| `Voltage` | `voltage` | Voltage in V |
+| `Global_intensity` | `globalIntensity` | Current intensity in A |
 
 ---
 
 ## Project Goal
 
-The goal of the project is to demonstrate a realistic IoT architecture where:
+The goal of the project is to demonstrate a complete IoT service-oriented architecture where:
 
-- readings are generated from a real dataset,
-- data is ingested through EdgeX Foundry,
-- services consume EdgeX events through MQTT,
-- readings are persisted in InfluxDB,
-- Grafana visualizes the readings,
-- monitoring logic detects high energy usage,
-- EdgeX Core Command triggers a command back to the device,
-- the device reacts by enabling load shedding.
+- a simulator reads real sensor data from a file,
+- data is sent to EdgeX Foundry through a Device Service,
+- EdgeX publishes events through MQTT,
+- a Visualization microservice stores data in InfluxDB,
+- Grafana displays the stored time-series readings,
+- a Monitoring microservice consumes the same MQTT events,
+- Monitoring applies a configurable rule through its REST API,
+- Monitoring sends commands through EdgeX Core Command,
+- the simulated device reacts by enabling or disabling load shedding.
 
 ---
 
 ## Architecture Overview
 
-The project uses a microservice-based design with EdgeX Foundry as the central IoT integration layer.
+The system uses EdgeX Foundry as the IoT middleware layer.
 
-High-level architecture:
-
-- **SensorSimulator** generates readings and receives control commands
-- **EdgeX Foundry** ingests readings and distributes events
-- **VisualizationService** consumes EdgeX events and writes to InfluxDB
-- **MonitoringService** consumes EdgeX events, applies rules, and sends commands through EdgeX Core Command
-- **InfluxDB** stores time-series data
-- **Grafana** displays dashboards and charts
+```text
+                                +----------------+
+                                |    Grafana     |
+                                +-------^--------+
+                                        |
+                                        |
++------------------+       +------------+------------+
+| SensorSimulator  | ----> | EdgeX Foundry / MQTT    |
+| smart-meter-1    |       | device-rest/core-data   |
++--------^---------+       +------------+------------+
+         |                              |
+         |                              |
+         |                    +---------+----------+
+         |                    | Visualization     |
+         |                    | Service           |
+         |                    +---------+----------+
+         |                              |
+         |                              v
+         |                        +-----+------+
+         |                        | InfluxDB   |
+         |                        +------------+
+         |
+         |                    +----------------+
+         +------------------- | Monitoring     |
+                              | Service        |
+                              +--------+-------+
+                                       |
+                                       v
+                              EdgeX Core Command
+```
 
 ---
 
 ## Main Components
 
-### 1. SensorSimulator
+### SensorSimulator
+
+The `SensorSimulator` acts as a simulated smart electricity meter.
 
 Responsibilities:
 
-- reads a sample household power consumption dataset
-- sends readings to `device-rest` in EdgeX
-- exposes an HTTP endpoint that receives the `LoadShedSwitch` command
-- modifies future readings when load shedding is enabled
+- reads household power consumption readings from a dataset file,
+- sends readings to EdgeX `device-rest`,
+- exposes an endpoint used by EdgeX write commands,
+- receives `LoadShedSwitch` commands,
+- changes future readings when load shedding is enabled.
 
-### 2. EdgeX Foundry
+When load shedding is enabled, high values are reduced before being sent again.
 
-Used services:
+---
+
+### EdgeX Foundry
+
+EdgeX Foundry is used as the IoT middleware platform.
+
+Used EdgeX services:
 
 - `device-rest`
 - `core-metadata`
 - `core-data`
 - `core-command`
-- `mqtt-broker`
+- `edgex-mqtt-broker`
 
 Responsibilities:
 
-- accepts incoming device readings
-- creates EdgeX events
-- publishes events to the EdgeX MQTT broker
-- forwards write commands back to the simulated device
+- receives device readings,
+- stores EdgeX events,
+- publishes events to MQTT,
+- forwards commands back to the simulated device.
 
-### 3. VisualizationService
+---
 
-Responsibilities:
+### VisualizationService
 
-- subscribes to `edgex/events/#`
-- parses EdgeX event envelopes
-- filters events for `smart-meter-1`
-- writes `globalActivePower`, `voltage`, and `globalIntensity` into InfluxDB
-
-### 4. MonitoringService
+The Visualization microservice represents the northbound/fog/cloud integration layer.
 
 Responsibilities:
 
-- subscribes to `edgex/events/#`
-- filters events for `smart-meter-1`
-- monitors `globalActivePower`
-- detects repeated threshold violations
-- sends `LoadShedSwitch` to EdgeX Core Command
-- avoids sending duplicate commands repeatedly once load shedding is already active
+- subscribes to the EdgeX MQTT topic `edgex/events/#`,
+- parses EdgeX event payloads,
+- filters events from `smart-meter-1`,
+- writes readings to InfluxDB.
 
-### 5. InfluxDB
+InfluxDB measurement:
+
+```text
+energy_readings
+```
+
+Stored fields:
+
+- `globalActivePower`
+- `voltage`
+- `globalIntensity`
+
+---
+
+### MonitoringService
+
+The Monitoring microservice also subscribes to the EdgeX MQTT topic `edgex/events/#`.
 
 Responsibilities:
 
-- stores time-series readings in bucket `energy-bucket`
+- receives EdgeX readings through MQTT,
+- exposes a REST API for monitoring rule configuration,
+- evaluates `globalActivePower`,
+- detects repeated threshold violations,
+- sends `LoadShedSwitch` commands through EdgeX Core Command,
+- avoids sending duplicate commands repeatedly while the alarm is already active,
+- provides manual endpoints for enabling and disabling load shedding.
 
-### 6. Grafana
+Default rule:
 
-Responsibilities:
+```text
+Device: smart-meter-1
+Resource: globalActivePower
+Threshold: 4.5
+Required consecutive readings: 3
+Command: LoadShedSwitch
+```
 
-- visualizes stored energy readings
-- shows power, voltage, and intensity over time
+---
+
+### InfluxDB
+
+InfluxDB stores time-series readings.
+
+Default configuration:
+
+```text
+Organization: p3-org
+Bucket: energy-bucket
+Token: super-secret-token
+```
+
+---
+
+### Grafana
+
+Grafana is used for visualization.
+
+The project includes Grafana provisioning files so the datasource and dashboard can be loaded automatically when Grafana starts.
 
 ---
 
@@ -159,20 +244,41 @@ Responsibilities:
 
 ### Normal data flow
 
-`SensorSimulator -> EdgeX device-rest -> EdgeX Core Data / MQTT events -> VisualizationService -> InfluxDB -> Grafana`
+```text
+SensorSimulator
+    -> EdgeX device-rest
+    -> EdgeX Core Data
+    -> EdgeX MQTT Broker
+    -> VisualizationService
+    -> InfluxDB
+    -> Grafana
+```
 
-### Monitoring data flow
+### Monitoring and command flow
 
-`SensorSimulator -> EdgeX device-rest -> EdgeX MQTT events -> MonitoringService -> EdgeX Core Command -> device-rest -> SensorSimulator`
+```text
+SensorSimulator
+    -> EdgeX device-rest
+    -> EdgeX MQTT Broker
+    -> MonitoringService
+    -> EdgeX Core Command
+    -> device-rest
+    -> SensorSimulator
+```
 
-### Closed-loop reaction
+### Closed-loop behavior
 
-1. the simulator sends high `globalActivePower` values
-2. MonitoringService detects repeated threshold violations
-3. MonitoringService sends `LoadShedSwitch`
-4. EdgeX Core Command forwards the command
-5. SensorSimulator receives the command
-6. future readings are reduced because load shedding is enabled
+1. SensorSimulator sends readings from the dataset.
+2. EdgeX receives readings through `device-rest`.
+3. EdgeX publishes events through MQTT.
+4. VisualizationService writes readings into InfluxDB.
+5. Grafana displays the data.
+6. MonitoringService detects high power usage.
+7. MonitoringService sends `LoadShedSwitch = true` through EdgeX Core Command.
+8. SensorSimulator receives the command.
+9. SensorSimulator enables load shedding.
+10. Future power values are reduced.
+11. MonitoringService detects that readings returned to a normal range.
 
 ---
 
@@ -181,62 +287,79 @@ Responsibilities:
 ```text
 P3-IoT-Energy-Monitoring
 ├── dataset
+│   └── household_power_consumption_sample.txt
 ├── edgex-config
+│   ├── smart-meter-device.json
+│   └── smart-meter-profile.yaml
 ├── grafana
-├── influxdb
+│   ├── dashboards
+│   │   └── energy-monitoring-dashboard.json
+│   └── provisioning
+│       ├── dashboards
+│       │   └── dashboard-provider.yml
+│       └── datasources
+│           └── influxdb.yml
 ├── monitoring-service
 │   └── MonitoringService
 ├── sensor-simulator
 │   └── SensorSimulator
 ├── visualization-service
 │   └── VisualizationService
+├── scripts
+│   └── register-edgex-device.ps1
 ├── docker-compose.yml
-└── README.md
+├── README.md
+└── .gitignore
 ```
+
+The `edgex-compose` repository is cloned locally inside this project folder, but it is ignored by Git and is not part of this repository.
 
 ---
 
 ## Technologies Used
 
 - .NET 10
-- ASP.NET Core / Minimal API
+- ASP.NET Core
 - EdgeX Foundry
 - MQTT
 - InfluxDB 2.x
 - Grafana
-- Docker / Docker Compose
+- Docker
+- Docker Compose
+- PowerShell
 - C#
 
 ---
 
 ## Prerequisites
 
-Before running the system, make sure you have:
+Before running the system, install:
 
-- **Docker Desktop**
-- **Git**
-- optional: **.NET 10 SDK** if you want to run services locally outside Docker
+- Docker Desktop
+- Git
+- PowerShell
+- .NET SDK only if you want to run or build services locally outside Docker
 
-You also need a separate local clone of the **EdgeX Compose** repository.
-
-> Note: this project does **not** include the entire `edgex-compose` repository inside itself. EdgeX is started from a separate folder/repository.
+Docker Desktop must be running before executing the commands.
 
 ---
 
 ## How to Run the System
 
-## 1. Clone the Repositories
+The following steps assume a Windows PowerShell environment.
 
-### Clone this project
+### 1. Clone this repository
 
 ```powershell
 git clone https://github.com/Dulle99/P3-IoT-Energy-Monitoring.git
+cd P3-IoT-Energy-Monitoring
 ```
 
-### Clone EdgeX Compose
+---
+
+### 2. Clone EdgeX Compose inside the project folder
 
 ```powershell
-cd C:\Projects
 git clone https://github.com/edgexfoundry/edgex-compose.git
 cd edgex-compose
 git checkout v4.0
@@ -244,99 +367,232 @@ git checkout v4.0
 
 ---
 
-## 2. Start EdgeX Foundry
+### 3. Start EdgeX Foundry
 
-From the `edgex-compose` folder:
+From inside the `edgex-compose` folder:
 
 ```powershell
-cd C:\Projects\edgex-compose
 docker compose -f docker-compose-no-secty.yml up -d
+```
+
+Verify that EdgeX containers are running:
+
+```powershell
 docker compose -f docker-compose-no-secty.yml ps
 ```
 
----
-
-## 3. Verify EdgeX Health
+Return to the project root:
 
 ```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:59986/api/v3/ping"
-Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/ping"
-Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/ping"
-Invoke-RestMethod -Method Get -Uri "http://localhost:59882/api/v3/ping"
-```
-
-These endpoints correspond to:
-
-- `device-rest`
-- `core-metadata`
-- `core-data`
-- `core-command`
-
-All of them should respond successfully.
-
----
-
-## 4. Register the Device Profile and Device
-
-If EdgeX was reset or started from a clean state, register the custom profile and device again.
-
-### Upload the device profile
-
-```powershell
-curl.exe -X POST -F "file=@C:/Projects/P3 IoT Energy Monitoring/edgex-config/smart-meter-profile.yaml" http://localhost:59881/api/v3/deviceprofile/uploadfile
-```
-
-### Create the device
-
-```powershell
-curl.exe -X POST -H "Content-Type: application/json" --data-binary "@C:/Projects/P3 IoT Energy Monitoring/edgex-config/smart-meter-device.json" http://localhost:59881/api/v3/device
-```
-
-### Verify profile and device registration
-
-```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/deviceprofile/name/smart-meter"
-Invoke-RestMethod -Method Get -Uri "http://localhost:59881/api/v3/device/name/smart-meter-1"
-Invoke-RestMethod -Method Get -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1"
+cd ..
 ```
 
 ---
 
-## 5. Start the Project Services
+### 4. Register the custom EdgeX device profile and device
+
+The project includes a PowerShell script that automatically registers:
+
+- the `smart-meter` device profile,
+- the `smart-meter-1` simulated device.
+
+Run it from the project root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register-edgex-device.ps1
+```
+
+Expected result:
+
+```text
+Device profile uploaded.
+Device created.
+Core Command can see 'smart-meter-1'.
+Registration completed successfully.
+```
+
+If the profile or device already exists, the script skips that step.
+
+---
+
+### 5. Start the project services
 
 From the project root:
 
 ```powershell
-cd "C:\Projects\P3 IoT Energy Monitoring"
 docker compose up -d --build
+```
+
+Check running containers:
+
+```powershell
 docker compose ps
 ```
 
-Expected services:
+Expected project containers:
 
-- `sensor-simulator`
-- `visualization-service`
-- `monitoring-service`
-- `influxdb`
-- `grafana`
+```text
+sensor-simulator
+visualization-service
+monitoring-service
+influxdb
+grafana
+```
 
 ---
 
-## 6. Check Service Logs
+## Useful URLs
 
-### SensorSimulator
+| Service | URL |
+|---|---|
+| Grafana | http://localhost:3000 |
+| InfluxDB | http://localhost:8086 |
+| MonitoringService Swagger | http://localhost:8082/swagger |
+| VisualizationService | http://localhost:8081 |
+| SensorSimulator command endpoint | http://localhost:7070/api/LoadShedSwitch |
+| EdgeX device-rest | http://localhost:59986 |
+| EdgeX core-metadata | http://localhost:59881 |
+| EdgeX core-data | http://localhost:59880 |
+| EdgeX core-command | http://localhost:59882 |
+
+---
+
+## Monitoring REST API
+
+Swagger UI is available at:
+
+```text
+http://localhost:8082/swagger
+```
+
+Available endpoints:
+
+```text
+GET  /api/monitoring/rule
+PUT  /api/monitoring/rule
+POST /api/monitoring/rule/reset-counter
+POST /api/monitoring/rule/reset-defaults
+POST /api/monitoring/rule/load-shed/on
+POST /api/monitoring/rule/load-shed/off
+```
+
+### Get current monitoring rule
+
+```powershell
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "http://localhost:8082/api/monitoring/rule"
+```
+
+### Update monitoring rule
+
+Example:
+
+```powershell
+$body = @{
+    threshold = 4.5
+    requiredConsecutiveReadings = 3
+} | ConvertTo-Json
+
+Invoke-RestMethod `
+  -Method Put `
+  -Uri "http://localhost:8082/api/monitoring/rule" `
+  -ContentType "application/json" `
+  -Body $body
+```
+
+### Reset monitoring counter
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8082/api/monitoring/rule/reset-counter"
+```
+
+### Reset rule to default values
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8082/api/monitoring/rule/reset-defaults"
+```
+
+### Enable load shedding manually
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8082/api/monitoring/rule/load-shed/on"
+```
+
+### Disable load shedding manually
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8082/api/monitoring/rule/load-shed/off"
+```
+
+The `load-shed/on` and `load-shed/off` endpoints send commands through EdgeX Core Command, not directly to the simulator.
+
+---
+
+## Grafana Dashboard
+
+Open Grafana:
+
+```text
+http://localhost:3000
+```
+
+Default credentials:
+
+```text
+admin / admin
+```
+
+The project contains Grafana provisioning files:
+
+```text
+grafana/provisioning/datasources/influxdb.yml
+grafana/provisioning/dashboards/dashboard-provider.yml
+grafana/dashboards/energy-monitoring-dashboard.json
+```
+
+Grafana should automatically load:
+
+- InfluxDB datasource,
+- Energy Monitoring dashboard.
+
+If the dashboard does not show data immediately, set the time range to:
+
+```text
+Last 5 minutes
+Last 15 minutes
+Last 1 hour
+```
+
+The system writes recent/current EdgeX event timestamps, so a recent time range should be used.
+
+---
+
+## Testing the System
+
+### 1. Check service logs
+
+SensorSimulator:
 
 ```powershell
 docker compose logs -f sensor-simulator
 ```
 
-### VisualizationService
+VisualizationService:
 
 ```powershell
 docker compose logs -f visualization-service
 ```
 
-### MonitoringService
+MonitoringService:
 
 ```powershell
 docker compose logs -f monitoring-service
@@ -344,244 +600,274 @@ docker compose logs -f monitoring-service
 
 ---
 
-## 7. Verify EdgeX Event Ingestion
+### 2. Verify EdgeX event ingestion
 
-Count events for the smart meter:
+Count events for the simulated smart meter:
 
 ```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/event/count/device/name/smart-meter-1"
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "http://localhost:59880/api/v3/event/count/device/name/smart-meter-1"
 ```
 
-Read events for the smart meter:
+Read events:
 
 ```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:59880/api/v3/event/device/name/smart-meter-1"
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "http://localhost:59880/api/v3/event/device/name/smart-meter-1"
 ```
 
 ---
 
-## 8. Verify InfluxDB
+### 3. Verify InfluxDB
 
-Health endpoint:
+Health check:
 
 ```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:8086/health"
+Invoke-RestMethod http://localhost:8086/health
 ```
 
-Open UI:
-
-- `http://localhost:8086`
-
-Expected bucket:
-
-- `energy-bucket`
-
-Expected measurement:
-
-- `energy_readings`
-
-Expected fields:
-
-- `globalActivePower`
-- `voltage`
-- `globalIntensity`
-
----
-
-## 9. Verify Grafana
-
-Open:
-
-- `http://localhost:3000`
-
-Check that the dashboard displays:
-
-- `globalActivePower`
-- `voltage`
-- `globalIntensity`
-
-### Important time note
-
-Originally the project used historical dataset timestamps.
-Now the system stores **EdgeX event origin timestamps**, which are recent/current.
-
-Because of that, Grafana should use a recent time range such as:
-
-- **Last 5 minutes**
-- **Last 15 minutes**
-- **Last 1 hour**
-
-If Grafana shows no data, the first thing to check is the dashboard time range.
-
----
-
-## 10. Verify Core Command Manually
-
-### Send `LoadShedSwitch = true` through EdgeX
+Query data from the InfluxDB container:
 
 ```powershell
-$body = @{
-    loadShedSwitch = "true"
-} | ConvertTo-Json
+docker exec -it influxdb influx query `
+'from(bucket: "energy-bucket")
+  |> range(start: -1h)
+  |> filter(fn: (r) => r._measurement == "energy_readings")
+  |> limit(n: 20)' `
+--org p3-org `
+--token super-secret-token
+```
 
+---
+
+### 4. Verify automatic monitoring reaction
+
+Reset rule to defaults:
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8082/api/monitoring/rule/reset-defaults"
+```
+
+Disable load shedding before a fresh test:
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8082/api/monitoring/rule/load-shed/off"
+```
+
+Restart the simulator:
+
+```powershell
+docker compose restart sensor-simulator
+```
+
+Watch MonitoringService logs:
+
+```powershell
+docker compose logs -f monitoring-service
+```
+
+Expected behavior:
+
+```text
+[THRESHOLD EXCEEDED]
+[THRESHOLD EXCEEDED]
+[THRESHOLD EXCEEDED]
+ALARM TRIGGERED
+Successfully sent command to EdgeX
+Reading back to normal: 2.5. Resetting consecutive count.
+```
+
+This means:
+
+- high readings were detected,
+- the rule condition was satisfied,
+- MonitoringService sent a command through EdgeX,
+- SensorSimulator enabled load shedding,
+- future readings were reduced.
+
+---
+
+### 5. Verify command reception in SensorSimulator
+
+```powershell
+docker compose logs --tail=100 sensor-simulator
+```
+
+Expected messages:
+
+```text
+Load shed command received. LoadShedEnabled set to True
+Load shed command received. LoadShedEnabled set to False
+```
+
+---
+
+
+## Direct SensorSimulator Command Test
+
+This test bypasses EdgeX and calls the simulator directly.
+
+Enable load shedding:
+
+```powershell
 Invoke-RestMethod `
   -Method Put `
-  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `
-  -ContentType "application/json" `
-  -Body $body
+  -Uri "http://localhost:7070/api/LoadShedSwitch" `
+  -ContentType "text/plain" `
+  -Body "true"
 ```
 
-### Send `LoadShedSwitch = false`
+Disable load shedding:
 
 ```powershell
-$body = @{
-    loadShedSwitch = "false"
-} | ConvertTo-Json
-
 Invoke-RestMethod `
   -Method Put `
-  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `
-  -ContentType "application/json" `
-  -Body $body
+  -Uri "http://localhost:7070/api/LoadShedSwitch" `
+  -ContentType "text/plain" `
+  -Body "false"
 ```
 
-Expected result:
-
-- EdgeX returns `statusCode: 200`
-- `sensor-simulator` receives the command
-- simulator toggles load shedding state
+This is useful only for debugging the simulator. The real project command path goes through EdgeX Core Command.
 
 ---
 
-## Expected End-to-End Behavior
+## Stopping the System
 
-When the system is working correctly:
-
-1. `sensor-simulator` reads the dataset and sends readings to EdgeX
-2. EdgeX registers the readings and emits events on `edgex/events/#`
-3. `visualization-service` consumes those events and writes values into InfluxDB
-4. Grafana shows the readings in near real time
-5. `monitoring-service` detects repeated threshold violations
-6. `monitoring-service` sends `LoadShedSwitch` through EdgeX Core Command
-7. EdgeX forwards the command back to `sensor-simulator`
-8. `sensor-simulator` enables load shedding
-9. future values are reduced
-
----
-
-## Command Flow
-
-### Direct command to SensorSimulator
+Stop only the project services:
 
 ```powershell
-Invoke-RestMethod -Method Put -Uri "http://localhost:7070/api/LoadShedSwitch" -ContentType "application/json" -Body '{"loadShedSwitch":"true"}'
+docker compose down
 ```
 
-This is useful for testing the simulator itself without going through EdgeX.
-
-### Full command through EdgeX
+Stop EdgeX services:
 
 ```powershell
-$body = @{
-    loadShedSwitch = "true"
-} | ConvertTo-Json
-
-Invoke-RestMethod `
-  -Method Put `
-  -Uri "http://localhost:59882/api/v3/device/name/smart-meter-1/LoadShedSwitch" `
-  -ContentType "application/json" `
-  -Body $body
+cd .\edgex-compose
+docker compose -f docker-compose-no-secty.yml down
+cd ..
 ```
-
-This is the real project path:
-
-- MonitoringService uses this path automatically
-- EdgeX forwards it through `device-rest`
-- SensorSimulator receives it as the simulated end device
 
 ---
 
-## Grafana Queries
+## Clean Runtime Data
 
-Example query for `globalActivePower`:
+If you want to reset local runtime data:
 
-```flux
-from(bucket: "energy-bucket")
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => r["_measurement"] == "energy_readings")
-  |> filter(fn: (r) => r["_field"] == "globalActivePower")
-  |> filter(fn: (r) => r["deviceId"] == "smart-meter-1")
+```powershell
+docker compose down
+
+Remove-Item -Recurse -Force .\grafana\data -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\influxdb\data -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\influxdb\config -ErrorAction SilentlyContinue
 ```
 
-Example query for `voltage`:
+Then start again:
 
-```flux
-from(bucket: "energy-bucket")
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => r["_measurement"] == "energy_readings")
-  |> filter(fn: (r) => r["_field"] == "voltage")
-  |> filter(fn: (r) => r["deviceId"] == "smart-meter-1")
-```
-
-Example query for `globalIntensity`:
-
-```flux
-from(bucket: "energy-bucket")
-  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
-  |> filter(fn: (r) => r["_measurement"] == "energy_readings")
-  |> filter(fn: (r) => r["_field"] == "globalIntensity")
-  |> filter(fn: (r) => r["deviceId"] == "smart-meter-1")
+```powershell
+docker compose up -d --build
 ```
 
 ---
 
 ## Troubleshooting
 
-### EdgeX returns `Unauthorized`
+### EdgeX network does not exist
 
-Reset and restart non-secure EdgeX:
+If project services fail with:
 
-```powershell
-cd C:\Projects\edgex-compose
-docker compose -f docker-compose-no-secty.yml down -v
-docker compose -f docker-compose-no-secty.yml up -d
+```text
+network edgex_edgex-network declared as external, but could not be found
 ```
 
-Then register the profile and device again.
+Start EdgeX first:
 
-### Device or profile missing after restart
+```powershell
+cd .\edgex-compose
+docker compose -f docker-compose-no-secty.yml up -d
+cd ..
+```
 
-Re-register:
+Then run:
 
-- the custom device profile
-- the custom device
+```powershell
+docker compose up -d --build
+```
 
-### InfluxDB bucket not found
+---
 
-Make sure the configured bucket is:
+### Device profile or device missing
 
-- `energy-bucket`
+Run:
 
-Also verify that `visualization-service` uses the same bucket in its environment variables.
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register-edgex-device.ps1
+```
 
-### Grafana shows no data
+---
+
+### InfluxDB does not start correctly
+
+If InfluxDB logs show a stale configuration or a conflict such as:
+
+```text
+config name "default" already exists
+```
+
+reset local InfluxDB runtime folders:
+
+```powershell
+docker compose down
+
+Remove-Item -Recurse -Force .\influxdb\data -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force .\influxdb\config -ErrorAction SilentlyContinue
+
+docker compose up -d influxdb
+```
+
+Check health:
+
+```powershell
+Invoke-RestMethod http://localhost:8086/health
+```
+
+---
+
+### Grafana dashboard shows no data
 
 Check:
 
-- InfluxDB contains points
-- dashboard time range is recent
-- Flux queries use `v.timeRangeStart` and `v.timeRangeStop`
+1. `visualization-service` logs show successful writes.
+2. InfluxDB is healthy.
+3. Grafana time range is recent, for example `Last 15 minutes`.
+4. The datasource is named `InfluxDB` and uses `uid: influxdb`.
 
-### Monitoring keeps sending the same command
+---
 
-This can happen if the threshold is set too low for testing.
+### Monitoring keeps sending commands repeatedly
+
+This can happen during testing if the threshold is set too low.
+
 Example:
 
-- if threshold is `2`
-- and load shedding reduces power to `2.5`
-- then the system still sees readings above threshold
+```text
+threshold = 2
+load shedding value = 2.5
+```
 
-For final testing, use realistic thresholds or ensure reduced readings go below the configured threshold.
+Since `2.5 > 2`, the system still sees readings above threshold.
+
+For the default demo, use:
+
+```text
+threshold = 4.5
+requiredConsecutiveReadings = 3
+```
 
 ---
 
@@ -589,13 +875,15 @@ For final testing, use realistic thresholds or ensure reduced readings go below 
 
 This project demonstrates a full closed-loop IoT control pipeline:
 
-- simulated sensor readings
-- EdgeX ingestion
-- event-driven service consumption
-- persistence into InfluxDB
-- Grafana visualization
-- rule-based monitoring
-- command dispatch through EdgeX Core Command
-- reaction by the device simulator
+```text
+dataset reading
+    -> EdgeX ingestion
+    -> MQTT event distribution
+    -> InfluxDB persistence
+    -> Grafana visualization
+    -> rule-based monitoring
+    -> EdgeX Core Command
+    -> simulated device reaction
+```
 
-The final result is not only monitoring, but also **automated corrective action**.
+The final result is not only data monitoring, but also an automated reaction based on sensor readings.
