@@ -1,6 +1,7 @@
 # runtime / generated data
 grafana/data/
 influxdb/data/
+influxdb/config/
 
 # optional
 *.log
